@@ -1,7 +1,7 @@
 package com.yusuferen.mockgps.ui.screens
 
+import android.content.Context
 import android.widget.Toast
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -18,6 +18,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,19 +29,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapProperties
-import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.MarkerState
-import com.google.maps.android.compose.rememberCameraPositionState
 import com.yusuferen.mockgps.MainActivity
-import com.yusuferen.mockgps.R
 import com.yusuferen.mockgps.extensions.roundedShadow
 import com.yusuferen.mockgps.service.LocationHelper
 import com.yusuferen.mockgps.storage.StorageManager
@@ -48,8 +40,12 @@ import com.yusuferen.mockgps.ui.components.FavoritesListComponent
 import com.yusuferen.mockgps.ui.components.FooterComponent
 import com.yusuferen.mockgps.ui.components.SearchComponent
 import com.yusuferen.mockgps.ui.screens.viewmodels.MapViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.osmdroid.config.Configuration
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,60 +54,88 @@ fun MapScreen(
     activity: MainActivity,
 ) {
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     var isMocking by remember { mutableStateOf(false) }
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(mapViewModel.markerPosition.value, 15f)
-    }
-
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showBottomSheet by remember { mutableStateOf(false) }
+    
+    // Reference to the MapView for external control
+    var mapViewRef by remember { mutableStateOf<MapView?>(null) }
+    var markerRef by remember { mutableStateOf<Marker?>(null) }
 
-    val MapStyle = if (isSystemInDarkTheme())
-        MapStyleOptions.loadRawResourceStyle(LocalContext.current, R.raw.style_json)
-    else
-        MapStyleOptions("")
+    // Initialize OSMDroid configuration
+    DisposableEffect(Unit) {
+        Configuration.getInstance().load(context, context.getSharedPreferences("osmdroid", Context.MODE_PRIVATE))
+        Configuration.getInstance().userAgentValue = context.packageName
+        onDispose { }
+    }
 
-    fun animateCamera() {
-        scope.launch(Dispatchers.Main) {
-            cameraPositionState.animate(
-                update = CameraUpdateFactory.newCameraPosition(
-                    CameraPosition(mapViewModel.markerPosition.value, 15f, 0f, 0f)
-                ),
-                durationMs = 1000
-            )
+    fun updateMarkerOnMap(mapView: MapView, lat: Double, lon: Double) {
+        markerRef?.let { mapView.overlays.remove(it) }
+        
+        val newMarker = Marker(mapView).apply {
+            position = GeoPoint(lat, lon)
+            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+            title = "Selected Location"
         }
+        markerRef = newMarker
+        mapView.overlays.add(newMarker)
+        mapView.invalidate()
+    }
+
+    fun animateToPosition(mapView: MapView, lat: Double, lon: Double) {
+        mapView.controller.animateTo(GeoPoint(lat, lon))
+        updateMarkerOnMap(mapView, lat, lon)
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Google maps
-        GoogleMap(
+        // OpenStreetMap View
+        AndroidView(
             modifier = Modifier.fillMaxSize(),
-            onMapLoaded = {
-                LocationHelper.requestPermissions(activity)
-                mapViewModel.updateMarkerPosition(mapViewModel.markerPosition.value)
-            },
-            properties = MapProperties(
-                mapStyleOptions = MapStyle
-            ),
-            uiSettings = MapUiSettings(
-                tiltGesturesEnabled = false,
-                myLocationButtonEnabled = false,
-                zoomControlsEnabled = false,
-                mapToolbarEnabled = false,
-                compassEnabled = false
-            ),
-            onMapClick = { latLng ->
-                if (!isMocking) {
-                    mapViewModel.updateMarkerPosition(latLng)
+            factory = { ctx ->
+                MapView(ctx).apply {
+                    setTileSource(TileSourceFactory.MAPNIK)
+                    setMultiTouchControls(true)
+                    controller.setZoom(15.0)
+                    
+                    // Set initial position
+                    val initialLat = mapViewModel.markerPosition.value.latitude
+                    val initialLon = mapViewModel.markerPosition.value.longitude
+                    controller.setCenter(GeoPoint(initialLat, initialLon))
+                    
+                    // Add initial marker
+                    val marker = Marker(this).apply {
+                        position = GeoPoint(initialLat, initialLon)
+                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        title = "Selected Location"
+                    }
+                    markerRef = marker
+                    overlays.add(marker)
+                    
+                    // Handle map clicks
+                    setOnTouchListener { _, event ->
+                        if (event.action == android.view.MotionEvent.ACTION_UP && !isMocking) {
+                            val projection = projection
+                            val geoPoint = projection.fromPixels(event.x.toInt(), event.y.toInt()) as GeoPoint
+                            
+                            // Update marker position
+                            mapViewModel.updateMarkerPositionOSM(geoPoint.latitude, geoPoint.longitude)
+                            updateMarkerOnMap(this, geoPoint.latitude, geoPoint.longitude)
+                        }
+                        false
+                    }
+                    
+                    mapViewRef = this
+                    
+                    // Request permissions
+                    LocationHelper.requestPermissions(activity)
                 }
             },
-            cameraPositionState = cameraPositionState
-        ) {
-            Marker(
-                state = MarkerState(mapViewModel.markerPosition.value)
-            )
-        }
+            update = { mapView ->
+                mapViewRef = mapView
+            }
+        )
 
         Column(
             modifier = Modifier.statusBarsPadding()
@@ -125,11 +149,10 @@ fun MapScreen(
                     .roundedShadow(32.dp)
                     .zIndex(32f),
                 onSearch = { searchTerm ->
-                    // We don't want to support switching locations while already mocking
                     if (isMocking) {
                         Toast.makeText(
                             activity,
-                            "You can't search while mocking location",
+                            "Konum sahtelenirken arama yapamazsınız",
                             Toast.LENGTH_SHORT
                         ).show()
                         return@SearchComponent
@@ -138,13 +161,15 @@ fun MapScreen(
                     LocationHelper.geocoding(searchTerm) { foundLatLng ->
                         foundLatLng?.let {
                             mapViewModel.updateMarkerPosition(it)
-                            animateCamera()
+                            mapViewRef?.let { mv ->
+                                animateToPosition(mv, it.latitude, it.longitude)
+                            }
                         }
                     }
                 }
             )
 
-            // Favorites button.
+            // Favorites button
             IconButton(
                 modifier = Modifier
                     .padding(horizontal = 12.dp)
@@ -156,7 +181,7 @@ fun MapScreen(
             ) {
                 Icon(
                     imageVector = Icons.Filled.List,
-                    contentDescription = "show favorites"
+                    contentDescription = "Favorileri göster"
                 )
             }
         }
@@ -188,22 +213,21 @@ fun MapScreen(
                     if (isMocking) {
                         Toast.makeText(
                             activity,
-                            "You can't switch location while mocking",
+                            "Konum sahtelenirken değişiklik yapamazsınız",
                             Toast.LENGTH_SHORT
                         ).show()
                         return@FavoritesListComponent
                     }
-                    mapViewModel.apply {
-                        mapViewModel.updateMarkerPosition(clickedEntry.latLng)
-                        scope.launch {
-                            sheetState.hide()
-                            showBottomSheet = false
-                        }
-                        animateCamera()
+                    mapViewModel.updateMarkerPosition(clickedEntry.latLng)
+                    scope.launch {
+                        sheetState.hide()
+                        showBottomSheet = false
+                    }
+                    mapViewRef?.let { mv ->
+                        animateToPosition(mv, clickedEntry.latLng.latitude, clickedEntry.latLng.longitude)
                     }
                 }
             )
         }
-
     }
 }

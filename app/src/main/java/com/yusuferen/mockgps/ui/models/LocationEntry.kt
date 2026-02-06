@@ -1,6 +1,6 @@
 package com.yusuferen.mockgps.ui.models
 
-import com.google.android.gms.maps.model.LatLng
+import com.yusuferen.mockgps.ui.models.LatLng
 
 data class LocationEntry(
     var latLng: LatLng,

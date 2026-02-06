@@ -7,7 +7,7 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.location.provider.ProviderProperties
 import android.util.Log
-import com.google.android.gms.maps.model.LatLng
+import com.yusuferen.mockgps.ui.models.LatLng
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch

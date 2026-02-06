@@ -4,7 +4,7 @@ import android.location.Address
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.google.android.gms.maps.model.LatLng
+import com.yusuferen.mockgps.ui.models.LatLng
 import com.yusuferen.mockgps.extensions.displayString
 import com.yusuferen.mockgps.service.LocationHelper
 import com.yusuferen.mockgps.service.MockLocationService
@@ -28,6 +28,11 @@ class MapViewModel : ViewModel() {
         }
 
         checkIfFavorite()
+    }
+
+    // For OSMDroid which uses raw lat/lon
+    fun updateMarkerPositionOSM(lat: Double, lon: Double) {
+        updateMarkerPosition(LatLng(lat, lon))
     }
 
     fun toggleFavoriteForLocation() {

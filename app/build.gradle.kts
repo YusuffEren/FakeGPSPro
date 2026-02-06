@@ -78,9 +78,9 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
-    // Google maps for Compose
-    implementation("com.google.maps.android:maps-compose:4.3.0")
-
+    // OpenStreetMap (OSMDroid) - No API key required!
+    implementation("org.osmdroid:osmdroid-android:6.1.18")
+    
     // Viewmodel
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
 

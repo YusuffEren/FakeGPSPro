@@ -12,7 +12,7 @@ import android.os.IBinder
 import android.os.SystemClock
 import android.util.Log
 import android.widget.Toast
-import com.google.android.gms.maps.model.LatLng
+import com.yusuferen.mockgps.ui.models.LatLng
 import com.yusuferen.mockgps.FakeGPSProApp
 import com.yusuferen.mockgps.storage.StorageManager
 import kotlinx.coroutines.DelicateCoroutinesApi
