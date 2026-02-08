@@ -48,7 +48,7 @@ fun FavoritesListComponent(
             // Title
             Text(
                 modifier = Modifier.padding(horizontal = 16.dp),
-                text = "Favorite locations",
+                text = "Favori Konumlar",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
@@ -72,7 +72,7 @@ fun FavoritesListComponent(
             } else {
                 Text(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
-                    text = "No favorites have been added",
+                    text = "Henüz favori eklenmedi",
                     textAlign = TextAlign.Center
                 )
             }

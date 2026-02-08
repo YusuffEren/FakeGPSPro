@@ -173,7 +173,7 @@ fun FooterComponent(
                                 fontWeight = FontWeight.SemiBold,
                                 fontSize = 16.sp
                             ),
-                            text = if (isMocking) "Stop mocking" else "Start mocking"
+                            text = if (isMocking) "Durdur" else "Başlat"
                         )
                     }
                 }

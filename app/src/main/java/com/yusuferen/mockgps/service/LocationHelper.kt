@@ -14,7 +14,7 @@ import com.yusuferen.mockgps.FakeGPSProApp
 
 object LocationHelper {
     private const val REQUEST_CODE = 69
-    val DEFAULT_LOCATION = LatLng(40.712776, -74.005974)
+    val DEFAULT_LOCATION = LatLng(41.0082, 28.9784) // İstanbul
 
     fun requestPermissions(activity: ComponentActivity) {
         activity.requestPermissions(

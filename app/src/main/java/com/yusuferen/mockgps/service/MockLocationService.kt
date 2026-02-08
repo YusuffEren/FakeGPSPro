@@ -115,7 +115,7 @@ class MockLocationService : Service() {
             GlobalScope.launch(Dispatchers.Main) {
                 Toast.makeText(
                     ctx,
-                    "Mock location failed, you must set this app as your selected mock locations app.",
+                    "Sahte konum başarısız oldu, bu uygulamayı sahte konum uygulaması olarak seçmelisiniz.",
                     Toast.LENGTH_SHORT
                 ).show()
             }

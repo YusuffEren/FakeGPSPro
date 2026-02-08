@@ -2,36 +2,40 @@
 
 ## Proje Hakkında
 
-Bu Android uygulaması, cihazın GPS konumunu simüle etmenizi sağlar. Konum tabanlı uygulamaları test etmek veya farklı lokasyonları deneyimlemek için kullanılabilir.
+Kendi geliştirdiğim bu Android uygulaması, cihazın GPS konumunu simüle etmenizi sağlar. Uygulama geliştirme süreçlerinde test amaçlı veya konum tabanlı servisleri denemek için kullanılabilir.
 
 ## Özellikler
 
-- **Sahte Konum:** Harita üzerinde istediğiniz konumu seçin
-- **Gerçek Zamanlı Güncelleme:** Konum değişikliklerini anında uygulayın
-- **Favoriler:** Sık kullandığınız konumları kaydedin
-- **Konum Arama:** Adrese göre konum bulun
-- **Dark/Light Tema:** Kullanıcı tercihine göre tema desteği
+- **Sahte Konum Ayarlama:** Harita üzerinde istediğiniz konumu seçebilirsiniz
+- **Anlık Konum Güncellemesi:** Seçilen konum anında uygulanır
+- **Favoriler:** Sık kullandığınız konumları kaydedebilirsiniz
+- **Konum Arama:** Adres veya yer adına göre konum bulabilirsiniz
+- **Tema Desteği:** Sistem temasına uyumlu aydınlık/karanlık mod
 
 ## Gereksinimler
 
-- Android 9.0 (API 28) veya üstü
-- Geliştirici seçenekleri aktif
+- Android 9.0 (API 28) veya üzeri
+- Geliştirici seçeneklerinin aktif edilmesi
 - Sahte konum uygulaması izni
 
-## Kurulum
+## Kurulum ve Kullanım
 
 1. APK dosyasını cihazınıza yükleyin
-2. Geliştirici Seçenekleri > Sahte konum uygulamasını seç > FakeGPS Pro
-3. Uygulamayı açın ve haritadan konum seçin
-4. START butonuna basın
+2. Ayarlar > Geliştirici Seçenekleri > Sahte konum uygulaması seç > FakeGPS Pro
+3. Uygulamayı açın ve haritadan istediğiniz konumu seçin
+4. BAŞLAT butonuna basarak sahte konumu aktifleştirin
 
-## Teknolojiler
+## Kullanılan Teknolojiler
 
 - Kotlin
 - Jetpack Compose
-- Google Maps SDK
+- OpenStreetMap (OSMDroid)
 - Material Design 3
+
+## Geliştirici
+
+Yusuf Eren
 
 ## Lisans
 
-Bu proje eğitim amaçlı geliştirilmiştir.
+Bu proje kişisel kullanım amaçlıdır.

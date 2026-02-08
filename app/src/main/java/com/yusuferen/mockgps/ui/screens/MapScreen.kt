@@ -77,7 +77,7 @@ fun MapScreen(
         val newMarker = Marker(mapView).apply {
             position = GeoPoint(lat, lon)
             setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-            title = "Selected Location"
+            title = "Seçili Konum"
         }
         markerRef = newMarker
         mapView.overlays.add(newMarker)
@@ -108,7 +108,7 @@ fun MapScreen(
                     val marker = Marker(this).apply {
                         position = GeoPoint(initialLat, initialLon)
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                        title = "Selected Location"
+                        title = "Seçili Konum"
                     }
                     markerRef = marker
                     overlays.add(marker)

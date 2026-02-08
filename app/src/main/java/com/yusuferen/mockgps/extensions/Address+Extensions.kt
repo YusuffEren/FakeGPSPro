@@ -21,5 +21,5 @@ fun Address.displayString(): String {
     // Combine address lines and other details
     val result = addressLines.first().ifEmpty { otherDetails.joinToString(", ") }
 
-    return result.ifEmpty { "No address available" }
+    return result.ifEmpty { "Adres bulunamadı" }
 }

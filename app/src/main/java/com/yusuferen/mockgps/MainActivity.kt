@@ -47,18 +47,18 @@ class MainActivity : ComponentActivity() {
         if (isBound && LocationHelper.hasPermission(this)) {
             mockLocationService?.toggleMocking()
             if (mockLocationService?.isMocking == true) {
-                Toast.makeText(this, "Mocking location...", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Konum sahtesi başlatıldı...", Toast.LENGTH_SHORT).show()
                 VibratorService.vibrate()
                 return true
             } else if (mockLocationService?.isMocking == false) {
-                Toast.makeText(this, "Stopped mocking location...", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Konum sahtesi durduruldu...", Toast.LENGTH_SHORT).show()
                 VibratorService.vibrate()
                 return false
             }
         } else if (!isBound && LocationHelper.hasPermission(this))
-            Toast.makeText(this, "Service not bound", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Servis bağlı değil", Toast.LENGTH_SHORT).show()
         else
-            Toast.makeText(this, "No Location permission", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Konum izni verilmedi", Toast.LENGTH_SHORT).show()
 
         return false
     }

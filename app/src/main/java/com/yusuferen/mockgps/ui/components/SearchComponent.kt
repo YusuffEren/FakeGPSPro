@@ -54,7 +54,7 @@ fun SearchComponent(
             singleLine = true,
             maxLines = 1,
             textStyle = TextStyle.Default,
-            label = { Text("Search Location") },
+            label = { Text("Konum Ara") },
             colors = TextFieldDefaults.textFieldColors(
                 containerColor = MaterialTheme.colorScheme.surface,
                 focusedIndicatorColor = Color.Transparent,
