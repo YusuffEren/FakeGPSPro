@@ -80,11 +80,8 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        // Start the service
+        // Bind to the service (normal service olarak başlat, foreground sadece mocking başlayınca olacak)
         val serviceIntent = Intent(this, MockLocationService::class.java)
-        startService(serviceIntent)
-
-        // Bind to the service
         bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE)
     }
 
